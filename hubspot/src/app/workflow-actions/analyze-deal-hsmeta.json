@@ -1,0 +1,54 @@
+{
+  "uid": "analyze_deal",
+  "type": "workflow-action",
+  "config": {
+    "actionUrl": "https://dealpilot-hubspot.vercel.app/api/tools/analyze-deal",
+    "isPublished": false,
+    "supportedClients": [
+      {
+        "client": "AGENTS",
+        "toolType": "GET_DATA",
+        "llmConfig": {
+          "actionDescription": "Use this tool when the user asks about deal health, win probability, risk assessment, or wants to analyze a specific deal. Input: a HubSpot deal ID or deal name. The tool fetches deal properties (amount, stage, close date, last contacted date, owner) and returns a win probability score (0-100), identified risk signals (e.g., stale deal, missing decision maker, overdue close date), and a health summary with recommendations. If no deal ID is provided, do not invoke this tool."
+        }
+      },
+      {
+        "client": "WORKFLOWS"
+      }
+    ],
+    "inputFields": [
+      {
+        "typeDefinition": {
+          "name": "deal_id",
+          "type": "string",
+          "fieldType": "text"
+        },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      }
+    ],
+    "outputFields": [
+      { "typeDefinition": { "name": "win_score", "type": "string", "externalOptions": false } },
+      { "typeDefinition": { "name": "risk_signals", "type": "string", "externalOptions": false } },
+      { "typeDefinition": { "name": "health_summary", "type": "string", "externalOptions": false } },
+      { "typeDefinition": { "name": "recommendation", "type": "string", "externalOptions": false } }
+    ],
+    "labels": {
+      "en": {
+        "actionName": "Analyze Deal Health",
+        "appDisplayName": "DealPilot",
+        "actionDescription": "Analyze a deal's win probability, risk signals, and health score using AI.",
+        "actionCardContent": "Analyzing deal {{deal_id}}",
+        "inputFieldLabels": { "deal_id": "Deal ID" },
+        "inputFieldDescriptions": { "deal_id": "The HubSpot Deal ID to analyze" },
+        "outputFieldLabels": {
+          "win_score": "Win Probability Score",
+          "risk_signals": "Risk Signals",
+          "health_summary": "Health Summary",
+          "recommendation": "Recommendation"
+        }
+      }
+    },
+    "objectTypes": ["DEAL"]
+  }
+}

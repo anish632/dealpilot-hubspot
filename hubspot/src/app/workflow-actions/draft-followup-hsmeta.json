@@ -1,0 +1,72 @@
+{
+  "uid": "draft_followup",
+  "type": "workflow-action",
+  "config": {
+    "actionUrl": "https://dealpilot-hubspot.vercel.app/api/tools/draft-followup",
+    "isPublished": false,
+    "supportedClients": [
+      {
+        "client": "AGENTS",
+        "toolType": "GENERATE",
+        "llmConfig": {
+          "actionDescription": "Use this tool when the user wants to draft a follow-up email for a deal. Input: deal ID and optionally a tone (formal, casual, urgent) and context notes. The tool fetches the deal and associated contacts, then generates a personalized follow-up email with subject line and body based on the deal stage, last activity, and contact information. Returns email subject, body, and suggested send time. If the user doesn't specify a tone, default to 'professional'. If no deal ID is provided, do not invoke this tool."
+        }
+      }
+    ],
+    "inputFields": [
+      {
+        "typeDefinition": { "name": "deal_id", "type": "string", "fieldType": "text" },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      },
+      {
+        "typeDefinition": {
+          "name": "tone",
+          "type": "enumeration",
+          "fieldType": "select",
+          "options": [
+            { "value": "professional", "label": "Professional" },
+            { "value": "casual", "label": "Casual" },
+            { "value": "urgent", "label": "Urgent" }
+          ]
+        },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      },
+      {
+        "typeDefinition": { "name": "context_notes", "type": "string", "fieldType": "textarea" },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      }
+    ],
+    "outputFields": [
+      { "typeDefinition": { "name": "email_subject", "type": "string", "externalOptions": false } },
+      { "typeDefinition": { "name": "email_body", "type": "string", "externalOptions": false } },
+      { "typeDefinition": { "name": "suggested_send_time", "type": "string", "externalOptions": false } }
+    ],
+    "labels": {
+      "en": {
+        "actionName": "Draft Follow-up Email",
+        "appDisplayName": "DealPilot",
+        "actionDescription": "Generate a personalized follow-up email for a deal using AI.",
+        "actionCardContent": "Drafting follow-up for deal {{deal_id}}",
+        "inputFieldLabels": {
+          "deal_id": "Deal ID",
+          "tone": "Email Tone",
+          "context_notes": "Additional Context"
+        },
+        "inputFieldDescriptions": {
+          "deal_id": "The HubSpot Deal ID",
+          "tone": "The tone of the email (professional, casual, or urgent)",
+          "context_notes": "Any additional context to include"
+        },
+        "outputFieldLabels": {
+          "email_subject": "Email Subject",
+          "email_body": "Email Body",
+          "suggested_send_time": "Suggested Send Time"
+        }
+      }
+    },
+    "objectTypes": ["DEAL"]
+  }
+}

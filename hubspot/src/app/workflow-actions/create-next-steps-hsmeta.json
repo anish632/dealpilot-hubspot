@@ -1,0 +1,65 @@
+{
+  "uid": "create_next_steps",
+  "type": "workflow-action",
+  "config": {
+    "actionUrl": "https://dealpilot-hubspot.vercel.app/api/tools/create-next-steps",
+    "isPublished": false,
+    "supportedClients": [
+      {
+        "client": "AGENTS",
+        "toolType": "TAKE_ACTION",
+        "llmConfig": {
+          "actionDescription": "Use this tool when the user wants to create next steps, action items, or tasks for a deal. Input: deal ID and optionally an urgency level (high, medium, low). The tool fetches deal data, uses AI to generate 3 prioritized next-step recommendations, and creates a task in HubSpot associated to the deal. Returns the created task ID, summary, and full list of recommended next steps. Default urgency is 'medium'. If no deal ID is provided, do not invoke this tool."
+        }
+      }
+    ],
+    "inputFields": [
+      {
+        "typeDefinition": { "name": "deal_id", "type": "string", "fieldType": "text" },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      },
+      {
+        "typeDefinition": {
+          "name": "urgency",
+          "type": "enumeration",
+          "fieldType": "select",
+          "options": [
+            { "value": "high", "label": "High" },
+            { "value": "medium", "label": "Medium" },
+            { "value": "low", "label": "Low" }
+          ]
+        },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      }
+    ],
+    "outputFields": [
+      { "typeDefinition": { "name": "task_id", "type": "string", "externalOptions": false } },
+      { "typeDefinition": { "name": "task_summary", "type": "string", "externalOptions": false } },
+      { "typeDefinition": { "name": "next_steps", "type": "string", "externalOptions": false } }
+    ],
+    "labels": {
+      "en": {
+        "actionName": "Create Next Steps",
+        "appDisplayName": "DealPilot",
+        "actionDescription": "Generate AI-recommended next steps and create a task for a deal.",
+        "actionCardContent": "Creating next steps for deal {{deal_id}}",
+        "inputFieldLabels": {
+          "deal_id": "Deal ID",
+          "urgency": "Urgency Level"
+        },
+        "inputFieldDescriptions": {
+          "deal_id": "The HubSpot Deal ID",
+          "urgency": "Urgency level (high, medium, or low)"
+        },
+        "outputFieldLabels": {
+          "task_id": "Task ID",
+          "task_summary": "Task Summary",
+          "next_steps": "Next Steps"
+        }
+      }
+    },
+    "objectTypes": ["DEAL"]
+  }
+}

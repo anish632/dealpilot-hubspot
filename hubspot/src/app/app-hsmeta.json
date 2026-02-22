@@ -1,0 +1,18 @@
+{
+  "uid": "dealpilot_app",
+  "type": "app",
+  "config": {
+    "name": "DealPilot",
+    "description": "AI-powered deal intelligence for Breeze agents. Analyze deals, draft follow-ups, and create smart next steps.",
+    "uid": "dealpilot_app",
+    "scopes": [
+      "crm.objects.deals.read",
+      "crm.objects.deals.write",
+      "crm.objects.contacts.read",
+      "crm.objects.owners.read",
+      "timeline"
+    ],
+    "webhooks": {},
+    "distribution": "marketplace"
+  }
+}
