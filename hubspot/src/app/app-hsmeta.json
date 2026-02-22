@@ -9,6 +9,7 @@
       "type": "oauth",
       "redirectUrls": ["https://dealpilot-hubspot.vercel.app/api/auth/callback"],
       "requiredScopes": [
+        "oauth",
         "crm.objects.deals.read",
         "crm.objects.deals.write",
         "crm.objects.contacts.read",

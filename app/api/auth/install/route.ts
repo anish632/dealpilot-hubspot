@@ -12,11 +12,11 @@ export async function GET(request: NextRequest) {
   }
 
   const scopes = [
+    'oauth',
     'crm.objects.deals.read',
     'crm.objects.deals.write',
     'crm.objects.contacts.read',
     'crm.objects.owners.read',
-    'timeline',
   ];
 
   const authUrl = new URL('https://app.hubspot.com/oauth/authorize');
