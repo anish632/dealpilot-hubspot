@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
           to: { id: dealId },
           types: [
             {
-              associationCategory: 'HUBSPOT_DEFINED',
+              associationCategory: 'HUBSPOT_DEFINED' as any,
               associationTypeId: 216, // Task to Deal association
             },
           ],

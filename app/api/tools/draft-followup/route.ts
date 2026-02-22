@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     ]);
 
     // Fetch associated contacts
-    const associations = await hubspotClient.crm.deals.associationsApi.getAll(
+    const associations = await (hubspotClient.crm.deals as any).associationsApi.getAll(
       dealId,
       'contacts'
     );

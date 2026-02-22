@@ -1,18 +1,22 @@
 import OpenAI from 'openai';
 
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error('OPENAI_API_KEY environment variable is required');
-}
+let _openai: OpenAI | null = null;
 
-export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+function getClient(): OpenAI {
+  if (!_openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY environment variable is required');
+    }
+    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return _openai;
+}
 
 export async function generateCompletion(
   prompt: string,
   temperature: number = 0.7
 ): Promise<string> {
-  const completion = await openai.chat.completions.create({
+  const completion = await getClient().chat.completions.create({
     model: 'gpt-4o',
     messages: [{ role: 'user', content: prompt }],
     temperature,
