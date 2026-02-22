@@ -1,103 +1,83 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getHubSpotClient } from '@/lib/hubspot';
-import { generateCompletion } from '@/lib/openai';
 import { validateRequest } from '@/lib/validate';
-import { DRAFT_FOLLOWUP_PROMPT } from '@/lib/prompts';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.text();
-
-    // Validate HubSpot signature
-    const validationError = validateRequest(body, request);
-    if (validationError) return validationError;
-
-    const payload = JSON.parse(body);
-    const { inputFields } = payload;
+    const { inputFields } = await validateRequest(request);
     const dealId = inputFields?.deal_id;
     const tone = inputFields?.tone || 'professional';
     const contextNotes = inputFields?.context_notes || '';
 
     if (!dealId) {
-      return NextResponse.json(
-        { error: 'deal_id is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ outputFields: { email_subject: '', email_body: 'No deal ID provided.', suggested_send_time: '' } });
     }
 
-    // Fetch deal data from HubSpot
     const hubspotClient = await getHubSpotClient();
-    
+
     const deal = await hubspotClient.crm.deals.basicApi.getById(dealId, [
-      'dealname',
-      'amount',
-      'dealstage',
-      'closedate',
-      'notes_last_contacted',
-      'hs_lastmodifieddate',
+      'dealname', 'amount', 'dealstage', 'closedate',
+      'notes_last_contacted', 'hs_lastmodifieddate',
     ]);
 
-    // Fetch associated contacts
-    const associations = await hubspotClient.crm.associations.v4.basicApi.getPage(
-      'deals',
-      dealId,
-      'contacts'
-    );
+    // Fetch primary contact
+    let contactInfo = '';
+    try {
+      const associations = await hubspotClient.crm.associations.v4.basicApi.getPage(
+        'deals', dealId, 'contacts', undefined, 1
+      );
+      if (associations.results && associations.results.length > 0) {
+        const contactId = associations.results[0].toObjectId;
+        const contact = await hubspotClient.crm.contacts.basicApi.getById(contactId, [
+          'firstname', 'lastname', 'email', 'jobtitle', 'company',
+        ]);
+        const cp = contact.properties;
+        contactInfo = [
+          `Contact: ${cp.firstname || ''} ${cp.lastname || ''}`.trim(),
+          cp.jobtitle ? `Title: ${cp.jobtitle}` : '',
+          cp.company ? `Company: ${cp.company}` : '',
+          cp.email ? `Email: ${cp.email}` : '',
+        ].filter(Boolean).join(' | ');
+      }
+    } catch { /* no associated contacts */ }
 
-    let contactData = {};
-    if (associations.results && associations.results.length > 0) {
-      const contactId = associations.results[0].toObjectId;
-      const contact = await hubspotClient.crm.contacts.basicApi.getById(contactId, [
-        'firstname',
-        'lastname',
-        'email',
-        'jobtitle',
-        'company',
-      ]);
+    const p = deal.properties;
+    const now = Date.now();
+    const daysSinceContact = p.notes_last_contacted
+      ? Math.floor((now - new Date(p.notes_last_contacted).getTime()) / 86400000)
+      : null;
+    const daysToClose = p.closedate
+      ? Math.floor((new Date(p.closedate).getTime() - now) / 86400000)
+      : null;
 
-      contactData = {
-        name: `${contact.properties.firstname || ''} ${contact.properties.lastname || ''}`.trim(),
-        email: contact.properties.email,
-        title: contact.properties.jobtitle,
-        company: contact.properties.company,
-      };
-    }
+    // Build context for the Breeze agent to compose the email
+    const context = [
+      `Deal: ${p.dealname || 'Unnamed'}`,
+      `Amount: ${p.amount ? '$' + parseFloat(p.amount).toLocaleString() : 'Not set'}`,
+      `Stage: ${p.dealstage || 'Unknown'}`,
+      `Last contacted: ${daysSinceContact !== null ? daysSinceContact + ' days ago' : 'No record'}`,
+      `Close date: ${daysToClose !== null ? (daysToClose >= 0 ? 'in ' + daysToClose + ' days' : Math.abs(daysToClose) + ' days overdue') : 'Not set'}`,
+      contactInfo || 'No contact associated',
+      contextNotes ? `Additional context: ${contextNotes}` : '',
+    ].filter(Boolean).join('\n');
 
-    const dealData = {
-      id: deal.id,
-      name: deal.properties.dealname,
-      amount: deal.properties.amount,
-      stage: deal.properties.dealstage,
-      closeDate: deal.properties.closedate,
-      lastContacted: deal.properties.notes_last_contacted,
-      lastModified: deal.properties.hs_lastmodifieddate,
-    };
-
-    // Generate AI follow-up email
-    const prompt = DRAFT_FOLLOWUP_PROMPT
-      .replaceAll('{{TONE}}', tone)
-      .replaceAll('{{CONTEXT}}', contextNotes)
-      .replaceAll('{{DEAL_DATA}}', JSON.stringify(dealData, null, 2))
-      .replaceAll('{{CONTACT_DATA}}', JSON.stringify(contactData, null, 2));
-
-    const aiResponse = await generateCompletion(prompt, 0.8);
-    const draft = JSON.parse(aiResponse);
+    // Suggest send time based on data
+    let sendTime = 'Tuesday or Wednesday morning, 9-10 AM recipient local time';
+    if (daysToClose !== null && daysToClose <= 3 && daysToClose >= 0) sendTime = 'As soon as possible — close date is imminent';
+    if (daysSinceContact !== null && daysSinceContact > 14) sendTime = 'Today — contact has been cold for over 2 weeks';
 
     return NextResponse.json({
       outputFields: {
-        email_subject: draft.email_subject || 'Follow-up on our conversation',
-        email_body: draft.email_body || 'Draft email body',
-        suggested_send_time: draft.suggested_send_time || 'Within 24 hours',
+        email_subject: `Follow-up context for: ${p.dealname || 'deal ' + dealId}`,
+        email_body: `Tone requested: ${tone}\n\n${context}\n\nPlease use the above deal and contact context to compose a ${tone} follow-up email. The Breeze agent should draft the actual email copy based on this data.`,
+        suggested_send_time: sendTime,
       },
     });
   } catch (error) {
     console.error('Error drafting follow-up:', error);
     return NextResponse.json(
-      { 
-        error: 'Failed to draft follow-up email',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
+      { outputFields: { email_subject: '', email_body: 'Failed to fetch deal data for follow-up.', suggested_send_time: '' } },
+      { status: 200 }
     );
   }
 }

@@ -13,33 +13,33 @@ export function validateHubSpotSignature(
   return hash === signature;
 }
 
+interface HubSpotPayload {
+  callbackId?: string;
+  origin?: Record<string, unknown>;
+  context?: Record<string, unknown>;
+  inputFields: Record<string, string>;
+  fields?: Record<string, string>;
+}
+
 /**
- * Validates an incoming HubSpot request signature.
- * Returns a NextResponse error if validation fails, or null if the request is valid.
+ * Validates an incoming HubSpot request and returns the parsed payload.
+ * Throws an error with a NextResponse if validation fails.
  */
-export function validateRequest(
-  body: string,
-  request: NextRequest
-): NextResponse | null {
+export async function validateRequest(request: NextRequest): Promise<HubSpotPayload> {
+  const body = await request.text();
   const secret = process.env.HUBSPOT_SIGNATURE_SECRET;
 
-  if (!secret) {
-    console.error('HUBSPOT_SIGNATURE_SECRET is not configured — rejecting request');
-    return NextResponse.json(
-      { error: 'Server misconfiguration: signature secret not set' },
-      { status: 500 }
-    );
+  if (secret) {
+    const signature = request.headers.get('x-hubspot-signature-v2') || '';
+    const isValid = validateHubSpotSignature(secret, body, signature, request.url, 'POST');
+    if (!isValid) {
+      throw new Error('Invalid HubSpot signature');
+    }
   }
 
-  const signature = request.headers.get('x-hubspot-signature-v2') || '';
-  const isValid = validateHubSpotSignature(secret, body, signature, request.url, 'POST');
-
-  if (!isValid) {
-    return NextResponse.json(
-      { error: 'Invalid signature' },
-      { status: 401 }
-    );
-  }
-
-  return null;
+  const payload = JSON.parse(body);
+  return {
+    ...payload,
+    inputFields: payload.inputFields || payload.fields || {},
+  };
 }
