@@ -1,32 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getHubSpotClient } from '@/lib/hubspot';
 import { generateCompletion } from '@/lib/openai';
-import { validateHubSpotSignature } from '@/lib/validate';
+import { validateRequest } from '@/lib/validate';
 import { DRAFT_FOLLOWUP_PROMPT } from '@/lib/prompts';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text();
-    const signature = request.headers.get('x-hubspot-signature-v2') || '';
-    const url = request.url;
 
     // Validate HubSpot signature
-    if (process.env.HUBSPOT_SIGNATURE_SECRET) {
-      const isValid = validateHubSpotSignature(
-        process.env.HUBSPOT_SIGNATURE_SECRET,
-        body,
-        signature,
-        url,
-        'POST'
-      );
-
-      if (!isValid) {
-        return NextResponse.json(
-          { error: 'Invalid signature' },
-          { status: 401 }
-        );
-      }
-    }
+    const validationError = validateRequest(body, request);
+    if (validationError) return validationError;
 
     const payload = JSON.parse(body);
     const { inputFields } = payload;
@@ -54,14 +38,15 @@ export async function POST(request: NextRequest) {
     ]);
 
     // Fetch associated contacts
-    const associations = await (hubspotClient.crm.deals as any).associationsApi.getAll(
+    const associations = await hubspotClient.crm.associations.v4.basicApi.getPage(
+      'deals',
       dealId,
       'contacts'
     );
 
     let contactData = {};
     if (associations.results && associations.results.length > 0) {
-      const contactId = associations.results[0].id;
+      const contactId = associations.results[0].toObjectId;
       const contact = await hubspotClient.crm.contacts.basicApi.getById(contactId, [
         'firstname',
         'lastname',
@@ -90,10 +75,10 @@ export async function POST(request: NextRequest) {
 
     // Generate AI follow-up email
     const prompt = DRAFT_FOLLOWUP_PROMPT
-      .replace('{{TONE}}', tone)
-      .replace('{{CONTEXT}}', contextNotes)
-      .replace('{{DEAL_DATA}}', JSON.stringify(dealData, null, 2))
-      .replace('{{CONTACT_DATA}}', JSON.stringify(contactData, null, 2));
+      .replaceAll('{{TONE}}', tone)
+      .replaceAll('{{CONTEXT}}', contextNotes)
+      .replaceAll('{{DEAL_DATA}}', JSON.stringify(dealData, null, 2))
+      .replaceAll('{{CONTACT_DATA}}', JSON.stringify(contactData, null, 2));
 
     const aiResponse = await generateCompletion(prompt, 0.8);
     const draft = JSON.parse(aiResponse);

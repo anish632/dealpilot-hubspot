@@ -1,32 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getHubSpotClient } from '@/lib/hubspot';
 import { generateCompletion } from '@/lib/openai';
-import { validateHubSpotSignature } from '@/lib/validate';
+import { validateRequest } from '@/lib/validate';
 import { ANALYZE_DEAL_PROMPT } from '@/lib/prompts';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text();
-    const signature = request.headers.get('x-hubspot-signature-v2') || '';
-    const url = request.url;
 
     // Validate HubSpot signature
-    if (process.env.HUBSPOT_SIGNATURE_SECRET) {
-      const isValid = validateHubSpotSignature(
-        process.env.HUBSPOT_SIGNATURE_SECRET,
-        body,
-        signature,
-        url,
-        'POST'
-      );
-
-      if (!isValid) {
-        return NextResponse.json(
-          { error: 'Invalid signature' },
-          { status: 401 }
-        );
-      }
-    }
+    const validationError = validateRequest(body, request);
+    if (validationError) return validationError;
 
     const payload = JSON.parse(body);
     const { inputFields } = payload;
@@ -70,7 +54,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Generate AI analysis
-    const prompt = ANALYZE_DEAL_PROMPT.replace(
+    const prompt = ANALYZE_DEAL_PROMPT.replaceAll(
       '{{DEAL_DATA}}',
       JSON.stringify(dealData, null, 2)
     );

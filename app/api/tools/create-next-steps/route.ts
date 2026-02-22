@@ -1,32 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getHubSpotClient } from '@/lib/hubspot';
 import { generateCompletion } from '@/lib/openai';
-import { validateHubSpotSignature } from '@/lib/validate';
+import { validateRequest } from '@/lib/validate';
 import { CREATE_NEXT_STEPS_PROMPT } from '@/lib/prompts';
+import { AssociationSpecAssociationCategoryEnum } from '@hubspot/api-client/lib/codegen/crm/associations/v4/models/AssociationSpec';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text();
-    const signature = request.headers.get('x-hubspot-signature-v2') || '';
-    const url = request.url;
 
     // Validate HubSpot signature
-    if (process.env.HUBSPOT_SIGNATURE_SECRET) {
-      const isValid = validateHubSpotSignature(
-        process.env.HUBSPOT_SIGNATURE_SECRET,
-        body,
-        signature,
-        url,
-        'POST'
-      );
-
-      if (!isValid) {
-        return NextResponse.json(
-          { error: 'Invalid signature' },
-          { status: 401 }
-        );
-      }
-    }
+    const validationError = validateRequest(body, request);
+    if (validationError) return validationError;
 
     const payload = JSON.parse(body);
     const { inputFields } = payload;
@@ -66,8 +51,8 @@ export async function POST(request: NextRequest) {
 
     // Generate AI next steps
     const prompt = CREATE_NEXT_STEPS_PROMPT
-      .replace('{{URGENCY}}', urgency)
-      .replace('{{DEAL_DATA}}', JSON.stringify(dealData, null, 2));
+      .replaceAll('{{URGENCY}}', urgency)
+      .replaceAll('{{DEAL_DATA}}', JSON.stringify(dealData, null, 2));
 
     const aiResponse = await generateCompletion(prompt, 0.7);
     const nextSteps = JSON.parse(aiResponse);
@@ -90,7 +75,7 @@ export async function POST(request: NextRequest) {
           to: { id: dealId },
           types: [
             {
-              associationCategory: 'HUBSPOT_DEFINED' as any,
+              associationCategory: AssociationSpecAssociationCategoryEnum.HubspotDefined,
               associationTypeId: 216, // Task to Deal association
             },
           ],

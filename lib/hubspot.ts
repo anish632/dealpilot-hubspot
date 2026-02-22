@@ -1,6 +1,7 @@
 import { Client } from '@hubspot/api-client';
 
-// In-memory token storage (replace with database in production)
+// WARNING: In-memory token storage — tokens are lost on serverless cold starts.
+// Replace with a persistent store (e.g. database, KV, or encrypted cookies) before production use.
 const tokenStore = new Map<string, { accessToken: string; refreshToken: string; expiresAt: number }>();
 
 export function storeTokens(
