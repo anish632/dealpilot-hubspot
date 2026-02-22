@@ -12,9 +12,9 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const clientId = process.env.HUBSPOT_CLIENT_ID;
-  const clientSecret = process.env.HUBSPOT_CLIENT_SECRET;
-  const redirectUri = `${request.nextUrl.origin}/api/auth/callback`;
+  const clientId = process.env.HUBSPOT_CLIENT_ID?.trim();
+  const clientSecret = process.env.HUBSPOT_CLIENT_SECRET?.trim();
+  const redirectUri = 'https://dealpilot-hubspot.vercel.app/api/auth/callback';
 
   if (!clientId || !clientSecret) {
     return NextResponse.json(
@@ -41,6 +41,13 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('HubSpot token exchange failed:', {
+        status: response.status,
+        error: errorData,
+        clientIdLength: clientId.length,
+        clientIdPrefix: clientId.substring(0, 8),
+        redirectUri,
+      });
       throw new Error(errorData.message || 'Failed to exchange authorization code');
     }
 

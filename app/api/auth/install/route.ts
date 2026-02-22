@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   const clientId = process.env.HUBSPOT_CLIENT_ID?.trim();
-  const redirectUri = `${request.nextUrl.origin}/api/auth/callback`;
+  const appUrl = (process.env.APP_URL || request.nextUrl.origin).trim();
+  const redirectUri = `${appUrl}/api/auth/callback`;
   
   if (!clientId) {
     return NextResponse.json(
