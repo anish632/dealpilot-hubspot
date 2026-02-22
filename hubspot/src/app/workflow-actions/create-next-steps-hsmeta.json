@@ -3,7 +3,7 @@
   "type": "workflow-action",
   "config": {
     "actionUrl": "https://dealpilot-hubspot.vercel.app/api/tools/create-next-steps",
-    "isPublished": false,
+    "isPublished": true,
     "supportedClients": [
       {
         "client": "AGENTS",

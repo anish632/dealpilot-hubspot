@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html><body style="margin:0;padding:0;background:#fff">
+<canvas id="c" width="800" height="800"></canvas>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d');
+// Background - rounded rect with gradient
+const g=x.createLinearGradient(0,0,800,800);
+g.addColorStop(0,'#6C5CE7');g.addColorStop(1,'#4F46E5');
+x.beginPath();
+const r=120;
+x.moveTo(r,0);x.lineTo(800-r,0);x.quadraticCurveTo(800,0,800,r);
+x.lineTo(800,800-r);x.quadraticCurveTo(800,800,800-r,800);
+x.lineTo(r,800);x.quadraticCurveTo(0,800,0,800-r);
+x.lineTo(0,r);x.quadraticCurveTo(0,0,r,0);
+x.fillStyle=g;x.fill();
+
+// "DP" text
+x.fillStyle='#FFFFFF';
+x.font='bold 380px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+x.textAlign='center';x.textBaseline='middle';
+x.fillText('DP',400,420);
+</script>
+</body></html>
