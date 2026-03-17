@@ -66,7 +66,7 @@ https://dealpilot-hubspot.vercel.app/api/auth/install
 | Deals | Write | Updates deal properties when creating next steps |
 | Contacts | Read | Reads associated contact info (name, title, company, email) for follow-up drafting |
 | Tasks | Write | Creates HubSpot tasks for recommended next steps |
-| Owners | Read | Reads deal owner info for task assignment |
+| Owners | Sync From HubSpot | Reads deal owner info for task assignment and AI analysis (scope: crm.objects.owners.read) |
 
 ## Screenshots Needed
 1. Breeze agent analyzing a deal with DealPilot (win score, risks)
