@@ -2,7 +2,7 @@
   "uid": "draft_followup",
   "type": "workflow-action",
   "config": {
-    "actionUrl": "https://dealpilot-hubspot.vercel.app/api/tools/draft-followup",
+    "actionUrl": "https://dealpilot.dasgroupllc.com/api/tools/draft-followup",
     "isPublished": true,
     "supportedClients": [
       {

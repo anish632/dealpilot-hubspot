@@ -2,7 +2,7 @@
   "uid": "analyze_deal",
   "type": "workflow-action",
   "config": {
-    "actionUrl": "https://dealpilot-hubspot.vercel.app/api/tools/analyze-deal",
+    "actionUrl": "https://dealpilot.dasgroupllc.com/api/tools/analyze-deal",
     "isPublished": true,
     "supportedClients": [
       {

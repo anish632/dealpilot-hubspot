@@ -23,7 +23,7 @@ Complete step-by-step guide to deploy DealPilot to production.
 ### Configure OAuth
 
 1. Go to **Auth** tab
-2. Add **Redirect URL**: `https://dealpilot-hubspot.vercel.app/api/auth/callback` (update with your domain)
+2. Add **Redirect URL**: `https://dealpilot.dasgroupllc.com/api/auth/callback` (update with your domain)
 3. Add **Scopes**:
    - `crm.objects.deals.read`
    - `crm.objects.deals.write`
@@ -151,7 +151,7 @@ Before uploading, update all `actionUrl` values in the HubSpot project files to 
 
 Change:
 ```json
-"actionUrl": "https://dealpilot-hubspot.vercel.app/api/tools/analyze-deal"
+"actionUrl": "https://dealpilot.dasgroupllc.com/api/tools/analyze-deal"
 ```
 
 To:

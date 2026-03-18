@@ -98,7 +98,7 @@ npm install -g @hubspot/cli
 hs auth
 
 # Update action URLs in hubspot/src/app/workflow-actions/*.json
-# Change "https://dealpilot-hubspot.vercel.app" to your Vercel URL
+# Change "https://dealpilot.dasgroupllc.com" to your Vercel URL
 
 # Upload
 cd hubspot

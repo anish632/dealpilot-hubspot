@@ -16,7 +16,7 @@ export default function Setup() {
             <div className="text-white/50 space-y-3 text-sm leading-relaxed">
               <p>Click the <strong className="text-white/80">Install</strong> button on the HubSpot Marketplace listing, or visit:</p>
               <code className="block bg-white/5 rounded-lg px-4 py-3 text-white/60 border border-white/5">
-                https://dealpilot-hubspot.vercel.app/api/auth/install
+                https://dealpilot.dasgroupllc.com/api/auth/install
               </code>
               <p>You&apos;ll be redirected to HubSpot to authorize DealPilot. Grant the requested permissions:</p>
               <ul className="list-disc list-inside space-y-1 pl-2">

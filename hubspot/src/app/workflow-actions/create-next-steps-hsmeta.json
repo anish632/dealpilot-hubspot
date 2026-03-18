@@ -2,7 +2,7 @@
   "uid": "create_next_steps",
   "type": "workflow-action",
   "config": {
-    "actionUrl": "https://dealpilot-hubspot.vercel.app/api/tools/create-next-steps",
+    "actionUrl": "https://dealpilot.dasgroupllc.com/api/tools/create-next-steps",
     "isPublished": true,
     "supportedClients": [
       {

@@ -214,7 +214,7 @@ When you run `npm run build`:
 ## Deployment Structure (Vercel)
 
 ```
-Production URL: https://dealpilot-hubspot.vercel.app
+Production URL: https://dealpilot.dasgroupllc.com
 
 Endpoints:
 ├── GET  /                                      → Landing page

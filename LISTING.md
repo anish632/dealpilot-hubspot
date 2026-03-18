@@ -48,16 +48,16 @@ Free (during beta)
 support@dasgroupllc.com
 
 ## Documentation URL
-https://dealpilot-hubspot.vercel.app/setup
+https://dealpilot.dasgroupllc.com/setup
 
 ## Privacy Policy URL
-https://dealpilot-hubspot.vercel.app/privacy
+https://dealpilot.dasgroupllc.com/privacy
 
 ## Terms of Service URL
-https://dealpilot-hubspot.vercel.app/terms
+https://dealpilot.dasgroupllc.com/terms
 
 ## Install Button URL
-https://dealpilot-hubspot.vercel.app/api/auth/install
+https://dealpilot.dasgroupllc.com/api/auth/install
 
 ## Shared Data
 | Object | Direction | Description |

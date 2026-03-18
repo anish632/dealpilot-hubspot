@@ -7,7 +7,7 @@
     "distribution": "marketplace",
     "auth": {
       "type": "oauth",
-      "redirectUrls": ["https://dealpilot-hubspot.vercel.app/api/auth/callback"],
+      "redirectUrls": ["https://dealpilot.dasgroupllc.com/api/auth/callback"],
       "requiredScopes": [
         "oauth",
         "crm.objects.deals.read",
@@ -20,7 +20,7 @@
     },
     "permittedUrls": {
       "fetch": [
-        "https://dealpilot-hubspot.vercel.app",
+        "https://dealpilot.dasgroupllc.com",
         "https://api.hubapi.com",
         "https://api.openai.com"
       ],
@@ -29,8 +29,8 @@
     },
     "support": {
       "supportEmail": "support@dasgroupllc.com",
-      "documentationUrl": "https://dealpilot-hubspot.vercel.app",
-      "supportUrl": "https://dealpilot-hubspot.vercel.app"
+      "documentationUrl": "https://dealpilot.dasgroupllc.com",
+      "supportUrl": "https://dealpilot.dasgroupllc.com"
     }
   }
 }

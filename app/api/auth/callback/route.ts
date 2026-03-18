@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
   const clientId = process.env.HUBSPOT_CLIENT_ID?.trim();
   const clientSecret = process.env.HUBSPOT_CLIENT_SECRET?.trim();
-  const redirectUri = 'https://dealpilot-hubspot.vercel.app/api/auth/callback';
+  const redirectUri = 'https://dealpilot.dasgroupllc.com/api/auth/callback';
 
   if (!clientId || !clientSecret) {
     return NextResponse.json(
