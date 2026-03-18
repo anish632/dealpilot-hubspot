@@ -57,11 +57,6 @@
           "task_id": "Task ID",
           "task_summary": "Task Summary",
           "next_steps": "Next Steps"
-        },
-        "outputFieldDescriptions": {
-          "task_id": "The HubSpot Task ID of the newly created task, confirming the task was successfully created in HubSpot.",
-          "task_summary": "A brief summary of the created task including subject, priority, due date, and assignee.",
-          "next_steps": "The full list of 3 prioritized next-step recommendations from DealPilot's AI, each with a specific action, rationale, and timeline."
         }
       }
     },
