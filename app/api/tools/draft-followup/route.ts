@@ -6,7 +6,7 @@ import { DRAFT_FOLLOWUP_PROMPT } from '@/lib/prompts';
 
 export async function POST(request: NextRequest) {
   try {
-    const { inputFields } = await validateRequest(request);
+    const { inputFields, portalId } = await validateRequest(request);
     const dealId = inputFields?.deal_id;
     const tone = inputFields?.tone || 'professional';
     const contextNotes = inputFields?.context_notes || '';
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ outputFields: { email_subject: '', email_body: 'No deal ID provided.', suggested_send_time: '' } });
     }
 
-    const hubspotClient = await getHubSpotClient();
+    const hubspotClient = await getHubSpotClient(portalId);
 
     const deal = await hubspotClient.crm.deals.basicApi.getById(dealId, [
       'dealname', 'amount', 'dealstage', 'closedate',

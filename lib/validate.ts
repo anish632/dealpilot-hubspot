@@ -19,6 +19,7 @@ interface HubSpotPayload {
   context?: Record<string, unknown>;
   inputFields: Record<string, string>;
   fields?: Record<string, string>;
+  portalId?: string;
 }
 
 /**
@@ -38,8 +39,10 @@ export async function validateRequest(request: NextRequest): Promise<HubSpotPayl
   }
 
   const payload = JSON.parse(body);
+  const portalId = payload.origin?.portalId?.toString() || payload.context?.portalId?.toString() || '';
   return {
     ...payload,
     inputFields: payload.inputFields || payload.fields || {},
+    portalId,
   };
 }

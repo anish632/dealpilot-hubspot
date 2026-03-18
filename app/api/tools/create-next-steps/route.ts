@@ -4,7 +4,7 @@ import { validateRequest } from '@/lib/validate';
 
 export async function POST(request: NextRequest) {
   try {
-    const { inputFields } = await validateRequest(request);
+    const { inputFields, portalId } = await validateRequest(request);
     const dealId = inputFields?.deal_id;
     const urgency = inputFields?.urgency || 'medium';
 
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ outputFields: { task_id: '', task_summary: 'No deal ID provided.', next_steps: '' } });
     }
 
-    const hubspotClient = await getHubSpotClient();
+    const hubspotClient = await getHubSpotClient(portalId);
 
     const deal = await hubspotClient.crm.deals.basicApi.getById(dealId, [
       'dealname', 'amount', 'dealstage', 'closedate', 'hubspot_owner_id',

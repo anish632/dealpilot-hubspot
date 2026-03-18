@@ -66,8 +66,11 @@ export async function GET(request: NextRequest) {
       data.expires_in
     );
 
-    // Redirect to success page
-    return NextResponse.redirect(new URL('/?installed=true', request.nextUrl.origin));
+    // Redirect to success page with account info
+    const successUrl = new URL('/?installed=true', request.nextUrl.origin);
+    successUrl.searchParams.set('account', accountId);
+    successUrl.searchParams.set('refresh_token', data.refresh_token);
+    return NextResponse.redirect(successUrl);
   } catch (error) {
     console.error('OAuth callback error:', error);
     return NextResponse.json(
