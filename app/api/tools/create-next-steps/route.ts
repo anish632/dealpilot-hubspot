@@ -79,19 +79,18 @@ export async function POST(request: NextRequest) {
           hs_timestamp: dueDate.getTime().toString(),
           ...(p.hubspot_owner_id ? { hubspot_owner_id: p.hubspot_owner_id } : {}),
         },
-        associations: [
-          {
-            to: { id: dealId },
-            types: [
-              {
-                associationCategory: 'HUBSPOT_DEFINED' as any,
-                associationTypeId: 216,
-              },
-            ],
-          },
-        ],
+        associations: [],
       });
       taskId = task.id;
+      // Associate task with deal in a separate call to avoid slow combined request
+      try {
+        await hubspotClient.crm.associations.v4.basicApi.create(
+          'tasks', taskId, 'deals', dealId,
+          [{ associationCategory: 'HUBSPOT_DEFINED' as any, associationTypeId: 216 }]
+        );
+      } catch (assocErr) {
+        console.error('Failed to associate task with deal:', assocErr);
+      }
     } catch (e) {
       console.error('Failed to create task:', e);
     }
