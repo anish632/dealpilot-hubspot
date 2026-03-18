@@ -34,7 +34,7 @@ async function getAccessTokenForAccount(accountId: string): Promise<string | nul
   }
 
   // Look for refresh token in env vars
-  const refreshToken = process.env[`REFRESH_TOKEN_${accountId}`];
+  const refreshToken = process.env[`REFRESH_TOKEN_${accountId}`]?.trim();
   if (refreshToken) {
     try {
       const result = await refreshAccessToken(refreshToken);
@@ -94,8 +94,8 @@ export async function refreshAccessToken(refreshToken: string): Promise<{ access
     },
     body: new URLSearchParams({
       grant_type: 'refresh_token',
-      client_id: process.env.HUBSPOT_CLIENT_ID!,
-      client_secret: process.env.HUBSPOT_CLIENT_SECRET!,
+      client_id: process.env.HUBSPOT_CLIENT_ID!.trim(),
+      client_secret: process.env.HUBSPOT_CLIENT_SECRET!.trim(),
       refresh_token: refreshToken,
     }),
   });
